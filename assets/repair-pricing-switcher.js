@@ -40,16 +40,18 @@
 		}
 
 		var applecareHidden = hideApplecare && isApplecareEmpty(rows);
+		var labelAc = String(labels.col_label_applecare || 'AppleCare+');
+		var labelPrice = String(labels.col_label_price || 'Price');
 
 		var html = '';
 		html += '<div class="dms_prices__row dms_prices__row--head">';
 		html += '<div class="dms_prices__col dms_prices__col--service"></div>';
 
 		if (!applecareHidden) {
-			html += '<div class="dms_prices__col dms_prices__col--ac">' + escapeHtml(labels.col_label_applecare || 'AppleCare+') + '</div>';
+			html += '<div class="dms_prices__col dms_prices__col--ac">' + escapeHtml(labelAc) + '</div>';
 		}
 
-		html += '<div class="dms_prices__col dms_prices__col--price">' + escapeHtml(labels.col_label_price || 'Price') + '</div>';
+		html += '<div class="dms_prices__col dms_prices__col--price">' + escapeHtml(labelPrice) + '</div>';
 		html += '</div>';
 
 		rows.forEach(function (r) {
@@ -58,10 +60,10 @@
 			html += '<div class="dms_prices__col dms_prices__col--service">' + escapeHtml(r.service || '') + '</div>';
 
 			if (!applecareHidden) {
-				html += '<div class="dms_prices__col dms_prices__col--ac">' + escapeHtml(r.applecare || '') + '</div>';
+				html += '<div class="dms_prices__col dms_prices__col--ac" data-label="' + escapeHtml(labelAc) + '">' + escapeHtml(r.applecare || '') + '</div>';
 			}
 
-			html += '<div class="dms_prices__col dms_prices__col--price">' + escapeHtml(r.price || '') + '</div>';
+			html += '<div class="dms_prices__col dms_prices__col--price" data-label="' + escapeHtml(labelPrice) + '">' + escapeHtml(r.price || '') + '</div>';
 			html += '</div>';
 		});
 

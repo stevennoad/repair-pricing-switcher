@@ -111,3 +111,40 @@
 	padding: 10px 0;
 	opacity: .75;
 }
+
+
+@media (max-width: 600px) {
+	/* Stack pricing rows nicely on mobile */
+	.dms_prices__row {
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		padding: 12px 0;
+	}
+
+	/* Put service on its own line */
+	.dms_prices__col--service {
+		grid-column: 1 / -1;
+		font-weight: 600;
+	}
+
+	/* Hide the header row and use data-labels instead */
+	.dms_prices__row--head {
+		display: none;
+	}
+
+	/* Show labels above values */
+	.dms_prices__col--ac,
+	.dms_prices__col--price {
+		text-align: left;
+		white-space: normal;
+	}
+
+	.dms_prices__col--ac::before,
+	.dms_prices__col--price::before {
+		content: attr(data-label);
+		display: block;
+		font-size: 12px;
+		opacity: .7;
+		margin-bottom: 2px;
+	}
+}
