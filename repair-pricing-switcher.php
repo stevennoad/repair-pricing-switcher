@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/stevennoad/repair-pricing-switcher
  * Update URI: https://github.com/stevennoad/repair-pricing-switcher
  * Description: Elementor widget: dependent Device -> Model dropdowns that update a dynamic pricing table inside a single Elementor Template.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Steve Noad
  * Text Domain: repair-pricing-switcher
  */
@@ -13,8 +13,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
+// Composer autoloader (required for GitHub auto-updates via Plugin Update Checker)
+$autoload = __DIR__ . '/vendor/autoload.php';
+if ( file_exists( $autoload ) ) {
+	require_once $autoload;
+}
+
 final class RPS_Elementor_Plugin {
-	const VERSION = '1.0.1';
+	const VERSION = '1.0.2';
 
 	public function __construct() {
 		add_action( 'plugins_loaded', [ $this, 'init' ] );
@@ -22,6 +28,8 @@ final class RPS_Elementor_Plugin {
 
 	public function init() {
 		load_plugin_textdomain( 'repair-pricing-switcher', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+		$this->setup_updates();
 
 		if ( ! did_action( 'elementor/loaded' ) ) {
 			return;
@@ -33,6 +41,25 @@ final class RPS_Elementor_Plugin {
 		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_assets' ] );
 		add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'register_assets' ] );
+	}
+
+	private function setup_updates() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( ! class_exists( 'Puc_v5_Factory' ) ) {
+			return;
+		}
+
+		$update_checker = Puc_v5_Factory::buildUpdateChecker(
+			'https://github.com/stevennoad/repair-pricing-switcher/',
+			__FILE__,
+			'repair-pricing-switcher'
+		);
+
+		// Use GitHub Release Assets (upload a built ZIP that includes /vendor).
+		$update_checker->getVcsApi()->enableReleaseAssets();
 	}
 
 	public function register_assets() {
