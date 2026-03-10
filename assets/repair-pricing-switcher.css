@@ -148,3 +148,20 @@
 		margin-bottom: 2px;
 	}
 }
+
+
+/* Terms & Conditions */
+.dms_terms {
+	margin-top: 12px;
+	font-size: 13px;
+	opacity: .85;
+}
+
+/* When AppleCare+ is disabled/hidden */
+.dms--no-applecare .dms_prices__row {
+	grid-template-columns: 1fr 140px;
+}
+
+.dms--no-applecare .dms_prices__col--price {
+	text-align: right;
+}

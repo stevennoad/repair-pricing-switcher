@@ -77,6 +77,18 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+
+		$repeater->add_control(
+			'terms_text',
+			[
+				'label'       => __( 'Terms & Conditions', 'repair-pricing-switcher' ),
+				'type'        => \Elementor\Controls_Manager::TEXTAREA,
+				'rows'        => 4,
+				'label_block' => true,
+				'default'     => '',
+			]
+		);
+
 		$this->add_control(
 			'mappings',
 			[
@@ -219,6 +231,18 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+
+		$this->add_control(
+			'enable_applecare_column',
+			[
+				'label'        => __( 'Show AppleCare+ column', 'repair-pricing-switcher' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'repair-pricing-switcher' ),
+				'label_off'    => __( 'No', 'repair-pricing-switcher' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			]
+		);
 		$this->add_control(
 			'col_label_applecare',
 			[
@@ -376,6 +400,49 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+
+		$this->start_controls_section(
+			'section_style_terms',
+			[
+				'label' => __( 'Terms', 'repair-pricing-switcher' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'terms_text_color',
+			[
+				'label' => __( 'Text Color', 'repair-pricing-switcher' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .dms_terms' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name'     => 'terms_typography',
+				'selector' => '{{WRAPPER}} .dms_terms',
+			]
+		);
+
+		$this->add_responsive_control(
+			'terms_margin',
+			[
+				'label' => __( 'Margin', 'repair-pricing-switcher' ),
+				'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em' ],
+				'selectors' => [
+					'{{WRAPPER}} .dms_terms' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
 	}
 
 	private function get_elementor_templates_options() {
@@ -474,7 +541,17 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 				$index[ $device ] = [];
 			}
 
-			$index[ $device ][ $model ] = $this->parse_rows_text( $rows_text );
+			$terms_text = isset( $row['terms_text'] ) ? (string) $row['terms_text'] : '';
+
+			$terms_html = '';
+			if ( trim( $terms_text ) !== '' ) {
+				$terms_html = wpautop( wp_kses_post( $terms_text ) );
+			}
+
+			$index[ $device ][ $model ] = [
+				'rows'  => $this->parse_rows_text( $rows_text ),
+				'terms' => $terms_html,
+			];
 		}
 
 		return $index;
@@ -493,6 +570,7 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 			'placeholder_model'          => sanitize_text_field( (string) $settings['placeholder_model'] ),
 			'col_label_applecare'        => sanitize_text_field( (string) $settings['col_label_applecare'] ),
 			'col_label_price'            => sanitize_text_field( (string) $settings['col_label_price'] ),
+			'enable_applecare_column'    => ( isset( $settings['enable_applecare_column'] ) && $settings['enable_applecare_column'] === 'yes' ) ? 'yes' : 'no',
 			'hide_applecare_when_empty'  => ( isset( $settings['hide_applecare_when_empty'] ) && $settings['hide_applecare_when_empty'] === 'yes' ) ? 'yes' : 'no',
 			'show_empty_message'         => ( isset( $settings['show_empty_message'] ) && $settings['show_empty_message'] === 'yes' ) ? 'yes' : 'no',
 			'default_device'             => isset( $settings['default_device'] ) ? sanitize_text_field( (string) $settings['default_device'] ) : '',

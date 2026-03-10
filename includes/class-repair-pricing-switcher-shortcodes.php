@@ -10,6 +10,6 @@ class RPS_Shortcodes {
 	}
 
 	public function render_prices_mount() {
-		return '<div class="dms_prices" data-dms-prices></div>';
+		return '<div class="dms_prices" data-dms-prices></div><div class="dms_terms" data-dms-terms></div>';
 	}
 }

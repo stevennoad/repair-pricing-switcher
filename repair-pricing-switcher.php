@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/stevennoad/repair-pricing-switcher
  * Update URI: https://github.com/stevennoad/repair-pricing-switcher
  * Description: Elementor widget: dependent Device -> Model dropdowns that update a dynamic pricing table inside a single Elementor Template.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Steve Noad
  * Text Domain: repair-pricing-switcher
  */
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class RPS_Elementor_Plugin {
-	const VERSION = '1.0.3';
+	const VERSION = '1.0.4';
 
 	private $update_checker = null;
 

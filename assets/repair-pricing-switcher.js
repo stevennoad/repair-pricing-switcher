@@ -34,12 +34,12 @@
 		});
 	}
 
-	function renderPricesHtml(rows, labels, hideApplecare, showEmptyMessage) {
+	function renderPricesHtml(rows, labels, hideApplecare, showEmptyMessage, enableApplecare) {
 		if (!rows || !rows.length) {
 			return showEmptyMessage ? '<div class="dms_prices__empty">No pricing rows set for this model.</div>' : '';
 		}
 
-		var applecareHidden = hideApplecare && isApplecareEmpty(rows);
+		var applecareHidden = (!enableApplecare) || (hideApplecare && isApplecareEmpty(rows));
 		var labelAc = String(labels.col_label_applecare || 'AppleCare+');
 		var labelPrice = String(labels.col_label_price || 'Price');
 
@@ -82,10 +82,15 @@
 		});
 	}
 
-	function updateMounts($root, rows, labels, hideApplecare, showEmptyMessage) {
-		var html = renderPricesHtml(rows, labels, hideApplecare, showEmptyMessage);
+	function updateMounts($root, rows, termsHtml, labels, hideApplecare, showEmptyMessage, enableApplecare) {
+		var html = renderPricesHtml(rows, labels, hideApplecare, showEmptyMessage, enableApplecare);
+		$root.toggleClass('dms--no-applecare', html.indexOf('dms_prices__col--ac') === -1);
 		$root.find('[data-dms-prices]').each(function () {
 			$(this).html(html);
+		});
+
+		$root.find('[data-dms-terms]').each(function () {
+			$(this).html(termsHtml || '');
 		});
 	}
 
@@ -118,6 +123,7 @@
 		};
 
 		var hideApplecare = String(config.hide_applecare_when_empty || 'no') === 'yes';
+		var enableApplecare = String(config.enable_applecare_column || 'yes') === 'yes';
 		var showEmptyMessage = String(config.show_empty_message || 'yes') === 'yes';
 		var autoPickGlobal = String(config.auto_select_first_model || 'yes') === 'yes';
 
@@ -128,7 +134,7 @@
 		buildOptions($model, [], placeholders.model, !autoPickGlobal);
 		$model.prop('disabled', true);
 
-		updateMounts($root, [], labels, hideApplecare, showEmptyMessage);
+		updateMounts($root, [], '', labels, hideApplecare, showEmptyMessage, enableApplecare);
 		updateFloatingLabels($root);
 
 		$device.off('change.dms').on('change.dms', function () {
@@ -143,7 +149,7 @@
 
 			if (!models.length) {
 				$model.prop('disabled', true);
-				updateMounts($root, [], labels, hideApplecare, showEmptyMessage);
+				updateMounts($root, [], '', labels, hideApplecare, showEmptyMessage, enableApplecare);
 				updateFloatingLabels($root);
 				return;
 			}
@@ -171,12 +177,15 @@
 			var modelVal = $(this).val() || '';
 
 			if (!deviceVal || !modelVal || !index[deviceVal] || !index[deviceVal][modelVal]) {
-				updateMounts($root, [], labels, hideApplecare, showEmptyMessage);
+				updateMounts($root, [], '', labels, hideApplecare, showEmptyMessage, enableApplecare);
 				updateFloatingLabels($root);
 				return;
 			}
 
-			updateMounts($root, index[deviceVal][modelVal], labels, hideApplecare, showEmptyMessage);
+			var entry = index[deviceVal][modelVal];
+			var rows = Array.isArray(entry) ? entry : (entry && entry.rows ? entry.rows : []);
+			var termsHtml = (entry && !Array.isArray(entry) && entry.terms) ? entry.terms : '';
+			updateMounts($root, rows, termsHtml, labels, hideApplecare, showEmptyMessage, enableApplecare);
 			updateFloatingLabels($root);
 		});
 
