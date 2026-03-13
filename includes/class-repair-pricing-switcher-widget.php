@@ -102,6 +102,24 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'section_csv_tools',
+			[
+				'label' => __( 'CSV import / export', 'repair-pricing-switcher' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'csv_tools_info',
+			[
+				'type' => \Elementor\Controls_Manager::RAW_HTML,
+				'raw'  => $this->get_csv_tools_markup(),
+			]
+		);
+
+		$this->end_controls_section();
+
 		// 2) General renamed to Panel Template
 		$this->start_controls_section(
 			'section_panel',
@@ -208,6 +226,17 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Pricing table', 'repair-pricing-switcher' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'pricing_table_name',
+			[
+				'label'       => __( 'Pricing Table Name', 'repair-pricing-switcher' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => '',
+				'label_block' => true,
+				'description' => __( 'Used in wp-admin CSV tools so each pricing table is easy to recognise.', 'repair-pricing-switcher' ),
 			]
 		);
 
@@ -443,6 +472,17 @@ class RPS_Repair_Pricing_Switcher_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
+	}
+
+
+	private function get_csv_tools_markup() {
+		$tools_url = admin_url( 'options-general.php?page=repair-pricing-switcher-tools' );
+
+		return '<div class="rps-csv-tools">'
+			. '<p>' . esc_html__( 'For bigger repricing jobs, use the CSV tools page in wp-admin. You can export a pricing table, edit it in Excel, then import it back into a selected widget.', 'repair-pricing-switcher' ) . '</p>'
+			. '<p>' . esc_html__( 'Any imported changes are written into the widget data, so they still show here in Elementor for smaller follow-up edits.', 'repair-pricing-switcher' ) . '</p>'
+			. '<p><a class="elementor-button elementor-button-default" href="' . esc_url( $tools_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Open CSV tools page', 'repair-pricing-switcher' ) . '</a></p>'
+		. '</div>';
 	}
 
 	private function get_elementor_templates_options() {

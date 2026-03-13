@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/stevennoad/repair-pricing-switcher
  * Update URI: https://github.com/stevennoad/repair-pricing-switcher
  * Description: Elementor widget: dependent Device -> Model dropdowns that update a dynamic pricing table inside a single Elementor Template.
- * Version: 1.0.4
+ * Version: 1.1.0
  * Author: Steve Noad
  * Text Domain: repair-pricing-switcher
  */
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class RPS_Elementor_Plugin {
-	const VERSION = '1.0.4';
+	const VERSION = '1.1.0';
 
 	private $update_checker = null;
 
@@ -25,9 +25,11 @@ final class RPS_Elementor_Plugin {
 	public function init() {
 		load_plugin_textdomain( 'repair-pricing-switcher', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
-		// Updates + "Check updates" link (admin only)
+		// Updates + admin tools
 		if ( is_admin() ) {
 			$this->setup_updates();
+			require_once __DIR__ . '/includes/class-repair-pricing-switcher-admin.php';
+			new RPS_Repair_Pricing_Switcher_Admin( __FILE__ );
 		}
 
 		if ( ! did_action( 'elementor/loaded' ) ) {
@@ -40,6 +42,7 @@ final class RPS_Elementor_Plugin {
 		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_assets' ] );
 		add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'register_assets' ] );
+		add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'enqueue_editor_assets' ] );
 	}
 
 	private function setup_updates() {
@@ -147,21 +150,37 @@ final class RPS_Elementor_Plugin {
 
 	public function register_assets() {
 		$base_url = plugin_dir_url( __FILE__ );
+		$css_path = __DIR__ . '/assets/repair-pricing-switcher.css';
+		$js_path = __DIR__ . '/assets/repair-pricing-switcher.js';
+		$editor_js_path = __DIR__ . '/assets/repair-pricing-switcher-editor.js';
 
 		wp_register_style(
 			'rps-css',
 			$base_url . 'assets/repair-pricing-switcher.css',
 			[],
-			self::VERSION
+			file_exists( $css_path ) ? filemtime( $css_path ) : self::VERSION
 		);
 
 		wp_register_script(
 			'rps-js',
 			$base_url . 'assets/repair-pricing-switcher.js',
 			[ 'jquery' ],
-			self::VERSION,
+			file_exists( $js_path ) ? filemtime( $js_path ) : self::VERSION,
 			true
 		);
+
+		wp_register_script(
+			'rps-editor-js',
+			$base_url . 'assets/repair-pricing-switcher-editor.js',
+			[ 'jquery' ],
+			file_exists( $editor_js_path ) ? filemtime( $editor_js_path ) : self::VERSION,
+			true
+		);
+	}
+
+
+	public function enqueue_editor_assets() {
+		wp_enqueue_script( 'rps-editor-js' );
 	}
 
 	public function register_widgets( $widgets_manager ) {
